@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "735971227383",
+    "project_id": "secretarial",
+    "storage_bucket": "secretarial.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:735971227383:android:ae7f2dc6bd2cf7daf4c5f2",
+        "android_client_info": {
+          "package_name": "com.secretarial_app.dose.asml.www.secretarial_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnPDnwn-2aakqNmtVwbBEScNvRKvHBuRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
