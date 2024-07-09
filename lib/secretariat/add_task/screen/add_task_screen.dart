@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+// import 'package:googleapis_auth/auth_io.dart';
+// import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:intl/intl.dart';
-import 'package:googleapis_auth/auth_io.dart';
+
 import 'package:secretarial_app/global/common/loading_app.dart';
 
 import 'package:secretarial_app/global/components/appBar_app.dart';
@@ -14,6 +18,7 @@ import 'package:secretarial_app/global/components/text_field_app.dart';
 import 'package:secretarial_app/global/data/local/cache_helper.dart';
 import 'package:secretarial_app/global/utils/color_app.dart';
 import 'package:http/http.dart' as http;
+
 class AddTask extends StatefulWidget {
   const AddTask({Key? key}) : super(key: key);
 
@@ -288,14 +293,13 @@ class _AddTaskState extends State<AddTask> {
                             width: 200,
                             onTap: () {
                               if (_formKey.currentState!.validate()) {
-                                // addTask();
+                                addTask();
                               }
 
-
-                              addTask();
+                              // addTask();
                             }),
                       )
-                    :   Center(child: loadingAppWidget()),
+                    : Center(child: loadingAppWidget()),
               ],
             ),
           ),
@@ -306,7 +310,6 @@ class _AddTaskState extends State<AddTask> {
 
   void addTask() async {
     try {
-
       setState(() {
         _isLogin = false;
       });
@@ -314,34 +317,35 @@ class _AddTaskState extends State<AddTask> {
       String userID = CacheHelper.getData(key: 'UserID') ?? '';
       String fCMTokenAdmin = CacheHelper.getData(key: 'FCMTokenAdmin') ?? '';
       String userIDAdmin = CacheHelper.getData(key: 'UserIDAdmin') ?? '';
-        String emailSecretary = CacheHelper.getData(key: 'emailSecretary');
+      String emailSecretary = CacheHelper.getData(key: 'emailSecretary');
 
       String name = CacheHelper.getData(key: 'nameSecretary') ?? '';
-
-      // await _firestore.collection('tasks').add({
-      //   'title': _titleController.text,
-      //   'subtitle': _subtitleController.text,
-      //   'dateTime': _dateTimeController.text,
-      //   'importance': _importance,
-      //   'name': name,
-      //   'FCMToken': fCMToken,
-      //   'UserID': userID,
-      //   'FCMTokenAdmin': fCMTokenAdmin,
-      //   'UserIDAdmin': userIDAdmin,
-      //   'emailSecretary': emailSecretary,
-      //   'note_admin': '',
-      // });
+      int randomId = Random().nextInt(100000);
+      await _firestore.collection('tasks').add({
+        'title': _titleController.text,
+        'subtitle': _subtitleController.text,
+        'dateTime': _dateTimeController.text,
+        'importance': _importance,
+        'name': name,
+        'FCMToken': fCMToken,
+        'UserID': userID,
+        'FCMTokenAdmin': fCMTokenAdmin,
+        'UserIDAdmin': userIDAdmin,
+        'emailSecretary': emailSecretary,
+        'note_admin': '',
+        'status_task': 'Under revision',
+        'id': '$randomId',
+      });
 
       // await sendNotificationToAdmin();
-
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Task has been added")),
       );
 
-      // _titleController.clear();
-      // _subtitleController.clear();
-      // _dateTimeController.clear();
+      _titleController.clear();
+      _subtitleController.clear();
+      _dateTimeController.clear();
 
       setState(() {
         _isLogin = true;
@@ -358,52 +362,42 @@ class _AddTaskState extends State<AddTask> {
     }
   }
 
-
-  // Future<void> sendNotificationToAdmin() async {
-  //   const String fcmToken = 'eX3CP5JWRBeqC9DsQ00WU_:APA91bHTfUhXaJKeISHLhbfq9grBrYLAcEa3w2mdq5xfYHHJH8XT_6TEbkJnJEnAK6FcAUaff_P34oKQ3trgsGBSfCwZg7_AYPvlUV9bORemgNDzZzaIh2TqGgYzonF8mGVDip8W8WE4';
-  //
-  //
-  //   final serviceAccountJson = File('C:\\project_me\\secretarial_app\\secretarial-firebase-adminsdk-ckwmt-1ff646effb.json').readAsStringSync();
-  //   // final serviceAccountJson = await rootBundle.loadString('assets/secretarial-firebase-adminsdk-ckwmt-1ff646effb.json');
-  //
-  //   final serviceAccountCredentials = ServiceAccountCredentials.fromJson(serviceAccountJson);
-  //   const scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-  //   final authClient = await clientViaServiceAccount(serviceAccountCredentials, scopes);
-  //   const fcmEndpoint = 'https://fcm.googleapis.com/v1/projects/secretarial/messages:send';
-  //   final message = {
-  //     'message': {
-  //       'token': fcmToken,
-  //       'notification': {
-  //         'title': 'New Task',
-  //         'body': 'مرحبا',
-  //       },
-  //     },
-  //   };
-  //
-  //   // Send the notification
-  //   final response = await authClient.post(
-  //     Uri.parse(fcmEndpoint),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: jsonEncode(message),
-  //   );
-  //
-  //
-  //   if (response.statusCode == 200) {
-  //     print('Notification sent successfully!');
-  //   } else {
-  //     print('Failed to send notification. Status code: ${response.statusCode}');
-  //     print('Response body: ${response.body}');
-  //   }
-  //
-  //   // Close the authenticated client
-  //   authClient.close();
-  // }
-
-
-
-
-
-
+// Future<void> sendNotificationToAdmin() async {
+//   const String fcmToken = 'eX3CP5JWRBeqC9DsQ00WU_:APA91bHTfUhXaJKeISHLhbfq9grBrYLAcEa3w2mdq5xfYHHJH8XT_6TEbkJnJEnAK6FcAUaff_P34oKQ3trgsGBSfCwZg7_AYPvlUV9bORemgNDzZzaIh2TqGgYzonF8mGVDip8W8WE4';
+//   final serviceAccountJson = await rootBundle.loadString('assets/secretarial-firebase-adminsdk-ckwmt-1ff646effb.json');
+//
+//   final serviceAccountCredentials = ServiceAccountCredentials.fromJson(serviceAccountJson);
+//   const scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+//   final authClient = await clientViaServiceAccount(serviceAccountCredentials, scopes);
+//   const fcmEndpoint = 'https://fcm.googleapis.com/v1/projects/secretarial/messages:send';
+//   final message = {
+//     'message': {
+//       'token': fcmToken,
+//       'notification': {
+//         'title': 'New Task',
+//         'body': 'مرحبا',
+//       },
+//     },
+//   };
+//
+//   // Send the notification
+//   final response = await authClient.post(
+//     Uri.parse(fcmEndpoint),
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: jsonEncode(message),
+//   );
+//
+//
+//   if (response.statusCode == 200) {
+//     print('Notification sent successfully!');
+//   } else {
+//     print('Failed to send notification. Status code: ${response.statusCode}');
+//     print('Response body: ${response.body}');
+//   }
+//
+//   // Close the authenticated client
+//   authClient.close();
+// }
 }

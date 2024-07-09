@@ -8,6 +8,7 @@ import 'package:secretarial_app/global/components/no_data_widget.dart';
 import 'package:secretarial_app/global/data/local/cache_helper.dart';
 import 'package:secretarial_app/global/utils/color_app.dart';
 import 'package:secretarial_app/secretariat/add_task/screen/add_task_screen.dart';
+import 'package:secretarial_app/secretariat/edite_task/screen/edite_task_screen.dart';
 
 class HomeScreenSecretariat extends StatefulWidget {
   const HomeScreenSecretariat({Key? key}) : super(key: key);
@@ -25,6 +26,10 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
     super.initState();
     fetchTasks();
   }
+
+
+
+
 
   Future<void> navigateToAddTask() async {
     await Navigator.push(
@@ -56,6 +61,24 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
     }
   }
 
+
+  Future<void> navigateToEditTask(Map<String, dynamic> taskData) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditTaskScreen(
+          taskId: taskData['id'], // Pass the document ID
+          taskData: taskData,
+        ),
+      ),
+    );
+    fetchTasks();
+  }
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +99,7 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
       body: Container(
 
         width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
             gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -99,12 +123,16 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
                               : DateTime.tryParse(task['dateTime'] ?? '') ??
                                   DateTime.now();
 
-                          return AppointmentItem(
-                            title: task['title'] ?? 'No Title',
-                            details: task['subtitle'] ?? 'No Details',
-                            dateTime: dateTime,
-                            nameSecretary: task['name'] ?? 'No Name',
-                            importance: task['importance'] ?? 'No Importance',
+                          return GestureDetector(
+                            onTap: () => navigateToEditTask(task),
+                            child: AppointmentItem(
+                              statusTask: task['status_task'] ?? 'No Title',
+                              title: task['title'] ?? 'No Title',
+                              details: task['subtitle'] ?? 'No Details',
+                              dateTime: dateTime,
+                              nameSecretary: task['name'] ?? 'No Name',
+                              importance: task['importance'] ?? 'No Importance', noteAdmin: task['note_admin'] ?? '',
+                            ),
                           );
                         }).toList(),
                       ],
@@ -121,6 +149,9 @@ class AppointmentItem extends StatelessWidget {
   final DateTime dateTime;
   final String nameSecretary;
   final String importance;
+  final String statusTask;
+  final String noteAdmin;
+
 
   const AppointmentItem({
     Key? key,
@@ -128,7 +159,7 @@ class AppointmentItem extends StatelessWidget {
     required this.details,
     required this.dateTime,
     required this.nameSecretary,
-    required this.importance,
+    required this.importance, required this.statusTask, required this.noteAdmin,
   }) : super(key: key);
 
   @override
@@ -143,73 +174,131 @@ class AppointmentItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.0),
           ),
           color: const Color.fromRGBO(132, 139, 218, 1.0),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  details,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Date: ${dateTime.day}/${dateTime.month}/${dateTime.year}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
-                Text(
-                  'Time: ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
-                Text(
-                  'Name of the secretary : $nameSecretary',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      'Importance : $importance',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.white70,
+          child: Container(
+
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF606c88),
+                  Color(0xFF3f4c6b)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+
+
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
+
+
+                      noteAdmin  !=  '' ? Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),border: Border.all(color: Colors.white)),
+                        child: const Text(
+                          'modified',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ): Container(),
+
+
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    details,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70,
                     ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      height: 15,
-                      width: 15,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        color: _getImportanceColor(importance),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Date: ${dateTime.day}/${dateTime.month}/${dateTime.year}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Time: ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Name of the secretary : $nameSecretary',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Importance : $importance',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
                       ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        height: 15,
+                        width: 15,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: _getImportanceColor(importance),
+                        ),
+                      ),
+                    ],
+                  ),
+
+
+                  Text(
+                    "Manager's Note : $noteAdmin",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+
+
+
+                  Text(
+                    'Task status : $statusTask',
+
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:secretarial_app/administration/add_secretary/screen/add_secretary.dart';
 import 'package:secretarial_app/administration/all_secretarial/screen/all_secretarial.dart';
 import 'package:secretarial_app/administration/home/screen/home_screen.dart';
+import 'package:secretarial_app/administration/home/screen/main_screen.dart';
 import 'package:secretarial_app/auth/login/screen/login_screen.dart';
 // import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:secretarial_app/firebase_options.dart';
@@ -23,7 +24,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // await Firebase.initializeApp();
+  await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   SizeApp.screenSize =
       MediaQueryData.fromView(WidgetsBinding.instance.window).size;
@@ -41,12 +42,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // final NotificationService _notificationService = NotificationService();
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
     super.initState();
-    // _initApp();
+    _initApp();
   }
 
 
@@ -62,23 +63,23 @@ class _MyAppState extends State<MyApp> {
 
 
 
-  // Future<void> _initApp() async {
-  //   await _notificationService.init();
-  //  await requestNotificationPermission();
-  //     setupFirebaseMessagingListeners();
-  // }
+  Future<void> _initApp() async {
+    await _notificationService.init();
+   await requestNotificationPermission();
+      setupFirebaseMessagingListeners();
+  }
 
-  // void setupFirebaseMessagingListeners() {
-  //   FirebaseMessaging.instance.getInitialMessage().then(handleInitialMessage);
-  //   FirebaseMessaging.onMessage.listen(_notificationService.showNotification);
-  //   FirebaseMessaging.onMessageOpenedApp.listen(handleMessageOpenedApp);
-  // }
+  void setupFirebaseMessagingListeners() {
+    FirebaseMessaging.instance.getInitialMessage().then(handleInitialMessage);
+    FirebaseMessaging.onMessage.listen(_notificationService.showNotification);
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessageOpenedApp);
+  }
 
-  // void handleInitialMessage(RemoteMessage? message) {
-  //   if (message != null) {
-  //     print("Received initial message: ${message.messageId}");
-  //   }
-  // }
+  void handleInitialMessage(RemoteMessage? message) {
+    if (message != null) {
+      print("Received initial message: ${message.messageId}");
+    }
+  }
 
   void handleMessageOpenedApp(RemoteMessage message) {
     print("Message opened app: ${message.messageId}");
@@ -92,8 +93,9 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       home: LoginScreen(),
-      // home: HomeAdministrationScreen(),
-      // home: HomeAdministrationScreen(),
+      // home: MainScreen(),
+      // home: HomeScreenSecretariat(),
+      // home: HomeScreenSecretariat(),
     );
   }
 }

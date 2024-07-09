@@ -1,13 +1,17 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:secretarial_app/administration/home/screen/home_screen.dart';
+import 'package:secretarial_app/administration/home/screen/main_screen.dart';
 import 'package:secretarial_app/auth/reg/screen/registration_screen.dart';
 import 'package:secretarial_app/global/common/functions_app.dart';
 import 'package:secretarial_app/global/common/loading_app.dart';
@@ -254,6 +258,9 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
 
+
+      print('ASDASDASDASDASDASDWQEQWE');
+      print(userCredential);
       DocumentSnapshot userData = await _firestore.collection('users').doc(userCredential.user?.uid).get();
 
       Map<String, dynamic> data = userData.data() as Map<String, dynamic>;
@@ -282,17 +289,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
       } else {
 
-        String? fcmToken = await FirebaseMessaging.instance.getToken();
 
-        print("fcmToken");
-        print(fcmToken);
+        String? fcmToken;
+        if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+          fcmToken = await FirebaseMessaging.instance.getToken();
+          CacheHelper.saveData(key: 'FCMTokenAdmin', value: fcmToken);
+        }
+
         String userId = userCredential.user?.uid ?? '';
         String name = data['name'] ?? "";
-        CacheHelper.saveData(key: 'FCMTokenAdmin', value: fcmToken);
+
         CacheHelper.saveData(key: 'UserIDAdmin', value: userId);
         CacheHelper.saveData(key: 'nameAdmin', value: name);
 
-        navigateTo(context, const HomeAdministrationScreen());
+        navigateTo(context, const MainScreen());
         IsChanges(true);
 
       }

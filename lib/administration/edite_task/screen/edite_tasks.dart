@@ -74,47 +74,49 @@ class _EditeTasksState extends State<EditeTasks> {
 
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
 
-              const SizedBox(height: 90,),
+                const SizedBox(height: 90,),
 
-              const Text('A note can be added and shown to the secretary',style: TextStyle(
-                color: Color.fromRGBO(238, 243, 255, 1.0),fontWeight: FontWeight.w500,fontSize: 16
-              ),),
-
-
-
-              const SizedBox(height: 10,),
+                const Text('A note can be added and shown to the secretary',style: TextStyle(
+                  color: Color.fromRGBO(238, 243, 255, 1.0),fontWeight: FontWeight.w500,fontSize: 16
+                ),),
 
 
 
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: TextField(
-                  controller: _noteController,
-                  decoration: const InputDecoration(
-                    labelText: "Manager's Note",
-                    labelStyle: TextStyle(color: Colors.black),
-                    contentPadding: EdgeInsets.all(10.0),
-                    border: InputBorder.none,
+                const SizedBox(height: 10,),
+
+
+
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  style: const TextStyle(color: Colors.black),
+                  child: TextField(
+                    controller: _noteController,
+                    decoration: const InputDecoration(
+                      labelText: "Manager's Note",
+                      labelStyle: TextStyle(color: Colors.black),
+                      contentPadding: EdgeInsets.all(10.0),
+                      border: InputBorder.none,
+                    ),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              isLoading
-                  ?   loadingAppWidget()
-                  : ElevatedButton(
-                onPressed: _saveNote,
-                child: const Text('Save Note'),
-              ),
-            ],
+                const SizedBox(height: 20),
+                isLoading
+                    ?   loadingAppWidget()
+                    : ElevatedButton(
+                  onPressed: _saveNote,
+                  child: const Text('Save Note'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

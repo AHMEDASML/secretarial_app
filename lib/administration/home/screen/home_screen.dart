@@ -21,9 +21,7 @@ class HomeAdministrationScreen extends StatefulWidget {
 }
 
 class _HomeAdministrationScreenState extends State<HomeAdministrationScreen> {
-
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-
 
   @override
   void initState() {
@@ -36,23 +34,16 @@ class _HomeAdministrationScreenState extends State<HomeAdministrationScreen> {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('onMessage: ${message.notification}');
-
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('onMessageOpenedApp: ${message.notification}');
-
     });
 
     _firebaseMessaging.getToken().then((token) {
       print("Firebase Messaging Token: $token");
-
     });
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -94,10 +85,11 @@ class _HomeAdministrationScreenState extends State<HomeAdministrationScreen> {
           stream: FirebaseFirestore.instance
               .collection('tasks')
               .where('UserIDAdmin', isEqualTo: userID)
+              .where('status_task', isEqualTo: 'Under revision')
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return   Center(child: loadingAppWidget());
+              return Center(child: loadingAppWidget());
             }
 
             var tasks = snapshot.data!.docs;
@@ -110,28 +102,55 @@ class _HomeAdministrationScreenState extends State<HomeAdministrationScreen> {
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 var task = tasks[index];
-                return GestureDetector(
+                return
 
-                  onTap: () {
-                    navigateTo(
-                      context,
-                      EditeTasks(
-                        taskId: task.id,
-                        taskData: task.data() as Map<String, dynamic>,
-                      ),
-                    );
-                  },
+                  Dismissible(
+                    key: Key(task.id),
 
-                  child: AppointmentItem(
-                    title: task['title'],
-                    details: task['subtitle'],
-                    dateTime: DateTime.parse(task['dateTime']),
-                    importance: task['importance'] ?? 'No Importance',
+                    background: Container(
+                      color: Colors.green,
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(left: 20),
+                      child: const Icon(Icons.check, color: Colors.white),
+                    ),
 
-                    nameSecretary: task['name'], managerNote: task['note_admin'],
+                    secondaryBackground: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20),
+                      child: const Icon(Icons.close, color: Colors.white),
+                    ),
+                    confirmDismiss: (direction) async {
+                      if (direction == DismissDirection.startToEnd) {
+                        _updateTaskStatus(task.id, 'Accepted tasks');
+                      } else {
+                        _updateTaskStatus(task.id, 'Rejected tasks');
+                      }
+                      return false; // Return false to keep the item in the list
+                    },
 
-                  ),
-                );
+
+                    child: GestureDetector(
+                    onTap: () {
+                      navigateTo(
+                        context,
+                        EditeTasks(
+                          taskId: task.id,
+                          taskData: task.data() as Map<String, dynamic>,
+                        ),
+                      );
+                    },
+                    child: AppointmentItem(
+                      title: task['title'],
+                      details: task['subtitle'],
+                      dateTime: DateTime.parse(task['dateTime']),
+                      importance: task['importance'] ?? 'No Importance',
+                      nameSecretary: task['name'],
+                      managerNote: task['note_admin'],
+                      statusTask: task['status_task'],
+                    ),
+                                    ),
+                  );
               },
             );
           },
@@ -139,6 +158,14 @@ class _HomeAdministrationScreenState extends State<HomeAdministrationScreen> {
       ),
     );
   }
+
+  void _updateTaskStatus(String taskId, String newStatus) {
+    FirebaseFirestore.instance
+        .collection('tasks')
+        .doc(taskId)
+        .update({'status_task': newStatus});
+  }
+
 }
 
 class AppointmentItem extends StatelessWidget {
@@ -148,6 +175,7 @@ class AppointmentItem extends StatelessWidget {
   final String nameSecretary;
   final String importance;
   final String managerNote;
+  final String statusTask;
 
   const AppointmentItem({
     Key? key,
@@ -155,7 +183,9 @@ class AppointmentItem extends StatelessWidget {
     required this.details,
     required this.dateTime,
     required this.nameSecretary,
-    required this.importance, required this.managerNote,
+    required this.importance,
+    required this.managerNote,
+    required this.statusTask,
   }) : super(key: key);
 
   @override
@@ -169,7 +199,7 @@ class AppointmentItem extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
-          color: const Color.fromRGBO(132, 139, 218, 1.0),
+          color: const Color.fromRGBO(118, 124, 196, 1.0),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -188,7 +218,7 @@ class AppointmentItem extends StatelessWidget {
                   details,
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -196,32 +226,30 @@ class AppointmentItem extends StatelessWidget {
                   'Date: ${dateTime.day}/${dateTime.month}/${dateTime.year}',
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: Colors.white,
                   ),
                 ),
                 Text(
                   'Time: ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}',
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: Colors.white,
                   ),
                 ),
-                  Text(
+                Text(
                   "Secretary's name : $nameSecretary",
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: Colors.white,
                   ),
                 ),
-
-
                 Row(
                   children: [
                     Text(
                       'Importance : $importance',
                       style: const TextStyle(
                         fontSize: 14,
-                        color: Colors.white70,
+                        color: Colors.white,
                       ),
                     ),
                     Container(
@@ -235,17 +263,27 @@ class AppointmentItem extends StatelessWidget {
                     ),
                   ],
                 ),
-
-
-                  Text(
+                SizedBox(
+                  height: 5,
+                ),
+                Text(
                   "Manager's Note : $managerNote",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w700
                   ),
                 ),
-
-
+                SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  "Task status : $statusTask",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
               ],
             ),
           ),
@@ -266,7 +304,4 @@ class AppointmentItem extends StatelessWidget {
         return Colors.grey;
     }
   }
-
 }
-
-
