@@ -92,9 +92,9 @@ class _MyAppState extends State<MyApp> {
     return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: LoginScreen(),
+      // home: LoginScreen(),
       // home: MainScreen(),
-      // home: HomeScreenSecretariat(),
+      home: HomeScreenSecretariat(),
       // home: HomeScreenSecretariat(),
     );
   }

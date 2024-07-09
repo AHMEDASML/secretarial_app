@@ -27,10 +27,6 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
     fetchTasks();
   }
 
-
-
-
-
   Future<void> navigateToAddTask() async {
     await Navigator.push(
       context,
@@ -61,7 +57,6 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
     }
   }
 
-
   Future<void> navigateToEditTask(Map<String, dynamic> taskData) async {
     await Navigator.push(
       context,
@@ -74,10 +69,6 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
     );
     fetchTasks();
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -94,10 +85,11 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
         elevation: 0.0,
         backgroundColor: const Color.fromRGBO(143, 148, 251, 1),
         onPressed: navigateToAddTask,
-        child: const Icon(Icons.task_outlined,),
+        child: const Icon(
+          Icons.task_outlined,
+        ),
       ),
       body: Container(
-
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
@@ -110,7 +102,7 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
               Color.fromRGBO(184, 187, 255, 0.6),
             ])),
         child: isLoading
-            ?   Center(child: loadingAppWidget())
+            ? Center(child: loadingAppWidget())
             : tasks.isEmpty
                 ? const NoDataWidget()
                 : SingleChildScrollView(
@@ -131,7 +123,8 @@ class _HomeScreenSecretariatState extends State<HomeScreenSecretariat> {
                               details: task['subtitle'] ?? 'No Details',
                               dateTime: dateTime,
                               nameSecretary: task['name'] ?? 'No Name',
-                              importance: task['importance'] ?? 'No Importance', noteAdmin: task['note_admin'] ?? '',
+                              importance: task['importance'] ?? 'No Importance',
+                              noteAdmin: task['note_admin'] ?? '',
                             ),
                           );
                         }).toList(),
@@ -152,14 +145,15 @@ class AppointmentItem extends StatelessWidget {
   final String statusTask;
   final String noteAdmin;
 
-
   const AppointmentItem({
     Key? key,
     required this.title,
     required this.details,
     required this.dateTime,
     required this.nameSecretary,
-    required this.importance, required this.statusTask, required this.noteAdmin,
+    required this.importance,
+    required this.statusTask,
+    required this.noteAdmin,
   }) : super(key: key);
 
   @override
@@ -167,7 +161,6 @@ class AppointmentItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: SizedBox(
-
         child: Card(
           margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
           shape: RoundedRectangleBorder(
@@ -175,12 +168,9 @@ class AppointmentItem extends StatelessWidget {
           ),
           color: const Color.fromRGBO(132, 139, 218, 1.0),
           child: Container(
-
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Color(0xFF606c88),
-                  Color(0xFF3f4c6b)],
+                colors: [Color(0xFF606c88), Color(0xFF3f4c6b)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -194,8 +184,6 @@ class AppointmentItem extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
-
                       Text(
                         title,
                         style: const TextStyle(
@@ -204,22 +192,22 @@ class AppointmentItem extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-
-
-                      noteAdmin  !=  '' ? Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5),border: Border.all(color: Colors.white)),
-                        child: const Text(
-                          'modified',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ): Container(),
-
-
+                      noteAdmin != ''
+                          ? Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(color: Colors.white)),
+                              child: const Text(
+                                'modified',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                   const SizedBox(height: 5),
@@ -275,8 +263,6 @@ class AppointmentItem extends StatelessWidget {
                       ),
                     ],
                   ),
-
-
                   Text(
                     "Manager's Note : $noteAdmin",
                     style: const TextStyle(
@@ -285,12 +271,8 @@ class AppointmentItem extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-
-
-
                   Text(
                     'Task status : $statusTask',
-
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

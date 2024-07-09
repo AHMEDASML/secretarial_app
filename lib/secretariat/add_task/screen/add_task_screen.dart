@@ -5,8 +5,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:googleapis_auth/auth_io.dart';
-// import 'package:googleapis_auth/googleapis_auth.dart';
+import 'package:googleapis_auth/auth_io.dart';
+import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:intl/intl.dart';
 
 import 'package:secretarial_app/global/common/loading_app.dart';
@@ -337,7 +337,7 @@ class _AddTaskState extends State<AddTask> {
         'id': '$randomId',
       });
 
-      // await sendNotificationToAdmin();
+      await sendNotificationToAdmin();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Task has been added")),
@@ -362,42 +362,42 @@ class _AddTaskState extends State<AddTask> {
     }
   }
 
-// Future<void> sendNotificationToAdmin() async {
-//   const String fcmToken = 'eX3CP5JWRBeqC9DsQ00WU_:APA91bHTfUhXaJKeISHLhbfq9grBrYLAcEa3w2mdq5xfYHHJH8XT_6TEbkJnJEnAK6FcAUaff_P34oKQ3trgsGBSfCwZg7_AYPvlUV9bORemgNDzZzaIh2TqGgYzonF8mGVDip8W8WE4';
-//   final serviceAccountJson = await rootBundle.loadString('assets/secretarial-firebase-adminsdk-ckwmt-1ff646effb.json');
-//
-//   final serviceAccountCredentials = ServiceAccountCredentials.fromJson(serviceAccountJson);
-//   const scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-//   final authClient = await clientViaServiceAccount(serviceAccountCredentials, scopes);
-//   const fcmEndpoint = 'https://fcm.googleapis.com/v1/projects/secretarial/messages:send';
-//   final message = {
-//     'message': {
-//       'token': fcmToken,
-//       'notification': {
-//         'title': 'New Task',
-//         'body': 'مرحبا',
-//       },
-//     },
-//   };
-//
-//   // Send the notification
-//   final response = await authClient.post(
-//     Uri.parse(fcmEndpoint),
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: jsonEncode(message),
-//   );
-//
-//
-//   if (response.statusCode == 200) {
-//     print('Notification sent successfully!');
-//   } else {
-//     print('Failed to send notification. Status code: ${response.statusCode}');
-//     print('Response body: ${response.body}');
-//   }
-//
-//   // Close the authenticated client
-//   authClient.close();
-// }
+Future<void> sendNotificationToAdmin() async {
+  const String fcmToken = 'eX3CP5JWRBeqC9DsQ00WU_:APA91bHTfUhXaJKeISHLhbfq9grBrYLAcEa3w2mdq5xfYHHJH8XT_6TEbkJnJEnAK6FcAUaff_P34oKQ3trgsGBSfCwZg7_AYPvlUV9bORemgNDzZzaIh2TqGgYzonF8mGVDip8W8WE4';
+  final serviceAccountJson = await rootBundle.loadString('assets/secretarial-firebase-adminsdk-ckwmt-1ff646effb.json');
+
+  final serviceAccountCredentials = ServiceAccountCredentials.fromJson(serviceAccountJson);
+  const scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+  final authClient = await clientViaServiceAccount(serviceAccountCredentials, scopes);
+  const fcmEndpoint = 'https://fcm.googleapis.com/v1/projects/secretarial/messages:send';
+  final message = {
+    'message': {
+      'token': fcmToken,
+      'notification': {
+        'title': 'New Task',
+        'body': 'مرحبا',
+      },
+    },
+  };
+
+  // Send the notification
+  final response = await authClient.post(
+    Uri.parse(fcmEndpoint),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(message),
+  );
+
+
+  if (response.statusCode == 200) {
+    print('Notification sent successfully!');
+  } else {
+    print('Failed to send notification. Status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+  }
+
+  // Close the authenticated client
+  authClient.close();
+}
 }
