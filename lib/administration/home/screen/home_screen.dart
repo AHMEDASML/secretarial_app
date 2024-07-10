@@ -102,35 +102,31 @@ class _HomeAdministrationScreenState extends State<HomeAdministrationScreen> {
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 var task = tasks[index];
-                return
+                return Dismissible(
+                  key: Key(task.id),
+                  background: Container(
+                    color: Colors.green,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(left: 20),
+                    child: const Icon(Icons.check, color: Colors.white),
+                  ),
+                  secondaryBackground: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 20),
+                    child: const Icon(Icons.close, color: Colors.white),
+                  ),
+                  confirmDismiss: (direction) async {
+                    if (direction == DismissDirection.startToEnd) {
 
-                  Dismissible(
-                    key: Key(task.id),
+                      _updateTaskStatus(task.id, 'Accepted tasks');
 
-                    background: Container(
-                      color: Colors.green,
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(left: 20),
-                      child: const Icon(Icons.check, color: Colors.white),
-                    ),
-
-                    secondaryBackground: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20),
-                      child: const Icon(Icons.close, color: Colors.white),
-                    ),
-                    confirmDismiss: (direction) async {
-                      if (direction == DismissDirection.startToEnd) {
-                        _updateTaskStatus(task.id, 'Accepted tasks');
-                      } else {
-                        _updateTaskStatus(task.id, 'Rejected tasks');
-                      }
-                      return false; // Return false to keep the item in the list
-                    },
-
-
-                    child: GestureDetector(
+                    } else {
+                      _updateTaskStatus(task.id, 'Rejected tasks');
+                    }
+                    return false; // Return false to keep the item in the list
+                  },
+                  child: GestureDetector(
                     onTap: () {
                       navigateTo(
                         context,
@@ -149,8 +145,8 @@ class _HomeAdministrationScreenState extends State<HomeAdministrationScreen> {
                       managerNote: task['note_admin'],
                       statusTask: task['status_task'],
                     ),
-                                    ),
-                  );
+                  ),
+                );
               },
             );
           },
@@ -165,7 +161,6 @@ class _HomeAdministrationScreenState extends State<HomeAdministrationScreen> {
         .doc(taskId)
         .update({'status_task': newStatus});
   }
-
 }
 
 class AppointmentItem extends StatelessWidget {
@@ -269,10 +264,9 @@ class AppointmentItem extends StatelessWidget {
                 Text(
                   "Manager's Note : $managerNote",
                   style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700
-                  ),
+                      fontSize: 14,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700),
                 ),
                 SizedBox(
                   height: 5,
