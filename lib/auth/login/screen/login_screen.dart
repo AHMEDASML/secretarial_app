@@ -268,15 +268,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
       if (userRole == 'secretary') {
-        print("User is a secretary, returning false.");
+
 
         String userId = userCredential.user?.uid ?? '';
         DocumentSnapshot secretaryData = await _firestore.collection('users').doc(userId).get();
         Map<String, dynamic> secretaryInfo = secretaryData.data() as Map<String, dynamic>;
         // print("Secretary Information: $secretaryInfo");
-        print("Secretary Information");
+
         print(secretaryInfo['email']);
         print(secretaryInfo['name']);
+        print("Secretary Information");
+        print(secretaryInfo['FCMTokenAdmin']);
         CacheHelper.saveData(key: 'FCMTokenAdmin', value: secretaryInfo['FCMTokenAdmin']);
         CacheHelper.saveData(key: 'UserIDAdmin', value: secretaryInfo['UserIDAdmin']);
         CacheHelper.saveData(key: 'nameSecretary', value: secretaryInfo['name']);
@@ -294,6 +296,9 @@ class _LoginScreenState extends State<LoginScreen> {
         if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
           fcmToken = await FirebaseMessaging.instance.getToken();
           CacheHelper.saveData(key: 'FCMTokenAdmin', value: fcmToken);
+
+          print('fcmTokenfcmTokenfcmTokenfcmToken');
+          print(fcmToken);
         }
 
         String userId = userCredential.user?.uid ?? '';

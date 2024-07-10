@@ -38,16 +38,19 @@ class _MainScreenState extends State<MainScreen> {
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.remove_done),
-            label: 'Rejected tasks',
+            icon: Icon(Icons.task_alt),
+            label: 'Accepted tasks',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.task),
             label: 'Tasks',
           ),
+
+
+
           BottomNavigationBarItem(
-            icon: Icon(Icons.task_alt),
-            label: 'Accepted tasks',
+            icon: Icon(Icons.remove_done),
+            label: 'Rejected tasks',
           ),
         ],
       ),

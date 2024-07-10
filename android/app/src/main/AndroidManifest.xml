@@ -15,7 +15,7 @@
 
 
     <application
-        android:label="secretarial_app"
+        android:label="Mawaeedi"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
