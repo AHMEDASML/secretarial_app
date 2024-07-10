@@ -14,6 +14,7 @@ import 'package:secretarial_app/global/data/remote/dio_helper.dart';
 import 'package:secretarial_app/global/serves/firebase_messaging.dart';
 import 'package:secretarial_app/global/utils/size_app.dart';
 import 'package:secretarial_app/secretariat/add_task/screen/add_task_screen.dart';
+import 'package:secretarial_app/tttewrwer.dart';
 
 import 'secretariat/home/screen/home_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -25,6 +26,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await Firebase.initializeApp();
+
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   SizeApp.screenSize =
       MediaQueryData.fromView(WidgetsBinding.instance.window).size;
@@ -92,10 +94,11 @@ class _MyAppState extends State<MyApp> {
     return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      // home: LoginScreen(),
+      home: LoginScreen(),
       // home: MainScreen(),
-      home: HomeScreenSecretariat(),
       // home: HomeScreenSecretariat(),
+      // home: AddTask(),
+      // home: NotificationSenderScreen(),
     );
   }
 }

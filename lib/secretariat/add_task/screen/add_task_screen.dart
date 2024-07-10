@@ -1,14 +1,10 @@
-import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:googleapis_auth/auth_io.dart';
-import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:intl/intl.dart';
-
 import 'package:secretarial_app/global/common/loading_app.dart';
 
 import 'package:secretarial_app/global/components/appBar_app.dart';
@@ -16,8 +12,12 @@ import 'package:secretarial_app/global/components/button_app.dart';
 import 'package:secretarial_app/global/components/text_app_bold.dart';
 import 'package:secretarial_app/global/components/text_field_app.dart';
 import 'package:secretarial_app/global/data/local/cache_helper.dart';
+import 'package:secretarial_app/global/serves/firebase_messaging.dart';
+
+import 'package:secretarial_app/global/serves/push_notifications_serves.dart';
 import 'package:secretarial_app/global/utils/color_app.dart';
-import 'package:http/http.dart' as http;
+
+import 'package:permission_handler/permission_handler.dart';
 
 class AddTask extends StatefulWidget {
   const AddTask({Key? key}) : super(key: key);
@@ -27,6 +27,45 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
+  final NotificationService _notificationService = NotificationService();
+
+  @override
+  void initState() {
+    super.initState();
+    _initApp();
+  }
+
+  Future<void> _initApp() async {
+    await _notificationService.init();
+    await requestNotificationPermission();
+    setupFirebaseMessagingListeners();
+  }
+
+  Future<void> requestNotificationPermission() async {
+    final status = await Permission.notification.request();
+    if (status == PermissionStatus.granted) {
+      print("Notification Permission Granted");
+    } else {
+      print("Notification Permission Denied");
+    }
+  }
+
+  void setupFirebaseMessagingListeners() {
+    FirebaseMessaging.instance.getInitialMessage().then(handleInitialMessage);
+    FirebaseMessaging.onMessage.listen(_notificationService.showNotification);
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessageOpenedApp);
+  }
+
+  void handleInitialMessage(RemoteMessage? message) {
+    if (message != null) {
+      print("Received initial message: ${message.messageId}");
+    }
+  }
+
+  void handleMessageOpenedApp(RemoteMessage message) {
+    print("Message opened app: ${message.messageId}");
+  }
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _subtitleController = TextEditingController();
@@ -313,6 +352,9 @@ class _AddTaskState extends State<AddTask> {
       setState(() {
         _isLogin = false;
       });
+
+
+
       String fCMToken = CacheHelper.getData(key: 'FCMToken') ?? '';
       String userID = CacheHelper.getData(key: 'UserID') ?? '';
       String fCMTokenAdmin = CacheHelper.getData(key: 'FCMTokenAdmin') ?? '';
@@ -320,6 +362,8 @@ class _AddTaskState extends State<AddTask> {
       String emailSecretary = CacheHelper.getData(key: 'emailSecretary');
 
       String name = CacheHelper.getData(key: 'nameSecretary') ?? '';
+
+
       int randomId = Random().nextInt(100000);
       await _firestore.collection('tasks').add({
         'title': _titleController.text,
@@ -337,7 +381,7 @@ class _AddTaskState extends State<AddTask> {
         'id': '$randomId',
       });
 
-      await sendNotificationToAdmin();
+      sendNotification(fCMTokenAdmin);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Task has been added")),
@@ -351,7 +395,7 @@ class _AddTaskState extends State<AddTask> {
         _isLogin = true;
       });
     } catch (e) {
-      print('AAAAAAAASSSSSSSSSSSSSSS');
+
       print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to create secretary account: $e")),
@@ -362,42 +406,12 @@ class _AddTaskState extends State<AddTask> {
     }
   }
 
-Future<void> sendNotificationToAdmin() async {
-  const String fcmToken = 'eX3CP5JWRBeqC9DsQ00WU_:APA91bHTfUhXaJKeISHLhbfq9grBrYLAcEa3w2mdq5xfYHHJH8XT_6TEbkJnJEnAK6FcAUaff_P34oKQ3trgsGBSfCwZg7_AYPvlUV9bORemgNDzZzaIh2TqGgYzonF8mGVDip8W8WE4';
-  final serviceAccountJson = await rootBundle.loadString('assets/secretarial-firebase-adminsdk-ckwmt-1ff646effb.json');
-
-  final serviceAccountCredentials = ServiceAccountCredentials.fromJson(serviceAccountJson);
-  const scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-  final authClient = await clientViaServiceAccount(serviceAccountCredentials, scopes);
-  const fcmEndpoint = 'https://fcm.googleapis.com/v1/projects/secretarial/messages:send';
-  final message = {
-    'message': {
-      'token': fcmToken,
-      'notification': {
-        'title': 'New Task',
-        'body': 'مرحبا',
-      },
-    },
-  };
-
-  // Send the notification
-  final response = await authClient.post(
-    Uri.parse(fcmEndpoint),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: jsonEncode(message),
-  );
-
-
-  if (response.statusCode == 200) {
-    print('Notification sent successfully!');
-  } else {
-    print('Failed to send notification. Status code: ${response.statusCode}');
-    print('Response body: ${response.body}');
+  void sendNotification(String fCMTokenAdmin) async {
+    await PushNotificationsServes.sendNotificationsToSelectedDriver(
+      fCMTokenAdmin,
+      // 'dR4_P2gtQranG4j5Kv1rwT:APA91bGerJSjSYy5h-bADRISMP_R4ZABSq0qPvRJ9gbqanoRnxXVx14hO1CAjwrQYyZQ1wwpDcmRbP55n8DPyjAXxFcyd4gk5u3_hXVaJQtupROwkQRO_sNWFyewPWgH3q7qS-QBOybl',
+      context,
+      _subtitleController.text,
+    );
   }
-
-  // Close the authenticated client
-  authClient.close();
-}
 }
